@@ -1,8 +1,8 @@
-import makePanzoom from 'panzoom';
-import eventify from 'ngraph.events';
+import makePanzoom from "panzoom";
+import eventify from "ngraph.events";
 
-import Element from './Element';
-import onClap from './clap';
+import Element from "./Element";
+import onClap from "./clap";
 
 export default makeScene;
 
@@ -15,12 +15,14 @@ function makeScene(canvas, options) {
 
   var wglContextOptions = options.wglContext;
 
-  var gl = canvas.getContext('webgl', wglContextOptions) || canvas.getContext('experimental-webgl', wglContextOptions);
+  var gl =
+    canvas.getContext("webgl", wglContextOptions) ||
+    canvas.getContext("experimental-webgl", wglContextOptions);
 
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.enable(gl.BLEND);
   gl.clearColor(0, 0, 0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT)
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
   var frameToken = 0;
   var sceneRoot = new Element();
@@ -38,15 +40,17 @@ function makeScene(canvas, options) {
     dispose,
     renderFrame,
 
+    getCamera,
+
     getPixelRatio,
-    setPixelRatio
+    setPixelRatio,
   });
 
   var wglController = wglPanZoom(canvas, sceneRoot, api);
 
   var panzoom = makePanzoom(canvas, {
     zoomSpeed: 0.025,
-    controller: wglController 
+    controller: wglController,
   });
 
   sceneRoot.bindScene(api);
@@ -57,6 +61,10 @@ function makeScene(canvas, options) {
   renderFrame();
 
   return api;
+
+  function getCamera() {
+    return panzoom;
+  }
 
   function getPixelRatio() {
     return pixelRatio;
@@ -76,24 +84,24 @@ function makeScene(canvas, options) {
   }
 
   function setClearColor(r, g, b, a) {
-    gl.clearColor(r, g, b, a)
+    gl.clearColor(r, g, b, a);
   }
 
   function listenToEvents() {
-    canvas.addEventListener('mousemove', onMouseMove);
-    canvas.addEventListener('transform', onTransform);
+    canvas.addEventListener("mousemove", onMouseMove);
+    canvas.addEventListener("transform", onTransform);
 
     disposeClick = onClap(canvas, onMouseClick, this);
 
-    window.addEventListener('resize', onResize, true);
+    window.addEventListener("resize", onResize, true);
   }
 
   function dispose() {
-    canvas.removeEventListener('mousemove', onMouseMove);
-    canvas.removeEventListener('transform', onTransform);
+    canvas.removeEventListener("mousemove", onMouseMove);
+    canvas.removeEventListener("transform", onTransform);
     if (disposeClick) disposeClick();
 
-    window.removeEventListener('resize', onResize, true);
+    window.removeEventListener("resize", onResize, true);
 
     panzoom.dispose();
     sceneRoot.dispose();
@@ -127,21 +135,21 @@ function makeScene(canvas, options) {
   }
 
   function onTransform(e) {
-    api.fire('transform', e);
+    api.fire("transform", e);
   }
 
   function onMouseClick(e) {
     var p = getSceneCoordinate(e.clientX, e.clientY);
-    api.fire('click', {
+    api.fire("click", {
       originalEvent: e,
       sceneX: p.x,
       sceneY: p.y,
-    })
+    });
   }
 
   function onMouseMove(e) {
     var p = getSceneCoordinate(e.clientX, e.clientY);
-    api.fire('mousemove', {
+    api.fire("mousemove", {
       originalEvent: e,
       sceneX: p.x,
       sceneY: p.y,
@@ -152,36 +160,36 @@ function makeScene(canvas, options) {
     var t = sceneRoot.transform;
     var canvasX = clientX * pixelRatio;
     var canvasY = clientY * pixelRatio;
-    var x = (canvasX - t.dx)/t.scale;
-    var y = (canvasY - t.dy)/t.scale;
+    var x = (canvasX - t.dx) / t.scale;
+    var y = (canvasY - t.dy) / t.scale;
 
-    return {x, y};
+    return { x, y };
   }
 
   function getClientCoordinate(sceneX, sceneY) {
     var t = sceneRoot.transform;
 
-    var x = (sceneX * t.scale + t.dx)/pixelRatio;
-    var y = (sceneY * t.scale + t.dy)/pixelRatio;
+    var x = (sceneX * t.scale + t.dx) / pixelRatio;
+    var y = (sceneY * t.scale + t.dy) / pixelRatio;
 
-    return {x: x, y: y};
+    return { x: x, y: y };
   }
 
   function setViewBox(rect) {
     panzoom.showRectangle(rect, {
       width: width,
-      height: height
+      height: height,
     });
     var newT = panzoom.getTransform();
     wglController.applyTransform(newT);
   }
 
   function renderFrame() {
-    if (!frameToken) frameToken = requestAnimationFrame(frame)
+    if (!frameToken) frameToken = requestAnimationFrame(frame);
   }
 
   function frame() {
-    gl.clear(gl.COLOR_BUFFER_BIT)
+    gl.clear(gl.COLOR_BUFFER_BIT);
     drawContext.wasDirty = sceneRoot.updateWorldTransform();
     sceneRoot.draw(gl, drawContext);
     frameToken = 0;
@@ -192,7 +200,7 @@ function makeScene(canvas, options) {
   }
 
   function removeChild(child) {
-    sceneRoot.removeChild(child)
+    sceneRoot.removeChild(child);
   }
 
   function wglPanZoom(canvas, sceneRoot, scene) {
@@ -205,27 +213,27 @@ function makeScene(canvas, options) {
         transform.dy = newT.y * pixelRatio;
         transform.scale = newT.scale;
         sceneRoot.worldTransformNeedsUpdate = true;
-        scene.renderFrame()
+        scene.renderFrame();
       },
 
       getOwner() {
-        return canvas
-      }
-    }
+        return canvas;
+      },
+    };
 
-    if (options.size){
+    if (options.size) {
       controller.getScreenCTM = customSizeCTM;
     }
 
     return controller;
 
     function customSizeCTM() {
-        return {
-          a: (options.size.width/canvas.offsetWidth), //scale x
-          d: (options.size.height/canvas.offsetHeight), //scale y
-          e: 0,
-          f: 0
-        }
-      }
+      return {
+        a: options.size.width / canvas.offsetWidth, //scale x
+        d: options.size.height / canvas.offsetHeight, //scale y
+        e: 0,
+        f: 0,
+      };
+    }
   }
 }
