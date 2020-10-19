@@ -49,8 +49,13 @@ function makeScene(canvas, options) {
   var wglController = wglPanZoom(canvas, sceneRoot, api);
 
   var panzoom = makePanzoom(canvas, {
-    zoomSpeed: 0.025,
+    zoomSpeed: 0.035,
     controller: wglController,
+    maxZoom: 0.1,
+    minZoom: 0.03,
+    initialX: 0,
+    initialY: 0,
+    initialZoom: 0.03
   });
 
   sceneRoot.bindScene(api);
