@@ -55,7 +55,11 @@ function makeScene(canvas, options) {
     minZoom: 0.03,
     initialX: 0,
     initialY: 0,
-    initialZoom: 0.03
+    initialZoom: 0.03,
+    zoomDoubleClickSpeed: 1, // disable double click
+    onDoubleClick: function(e) {
+      return false; // tells the library to not preventDefault, and not stop propagation
+    }
   });
 
   sceneRoot.bindScene(api);
