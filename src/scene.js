@@ -14,6 +14,7 @@ function makeScene(canvas, options) {
   if (!options) options = {};
 
   var wglContextOptions = options.wglContext;
+  var wglPanzoomOptions = options.panzoom;
 
   var gl =
     canvas.getContext("webgl", wglContextOptions) ||
@@ -47,20 +48,9 @@ function makeScene(canvas, options) {
   });
 
   var wglController = wglPanZoom(canvas, sceneRoot, api);
+  wglPanzoomOptions.controller = wglController;
 
-  var panzoom = makePanzoom(canvas, {
-    zoomSpeed: 0.035,
-    controller: wglController,
-    maxZoom: 0.1,
-    minZoom: 0.03,
-    initialX: 0,
-    initialY: 0,
-    initialZoom: 0.03,
-    zoomDoubleClickSpeed: 1, // disable double click
-    onDoubleClick: function(e) {
-      return false; // tells the library to not preventDefault, and not stop propagation
-    }
-  });
+  var panzoom = makePanzoom(canvas, wglPanzoomOptions);
 
   sceneRoot.bindScene(api);
 
